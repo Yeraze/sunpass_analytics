@@ -17,6 +17,15 @@
 </div>
 
 <div class="row mb-4">
+    <div class="col-12">
+        <div class="chart-container" style="height: 450px;">
+            <h6>Daily Spending by Vehicle</h6>
+            <canvas id="dailyVehicleChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
     <div class="col-md-8">
         <div class="chart-container" style="height: 400px;">
             <h6>Spending by Road/Plaza</h6>
@@ -79,6 +88,13 @@ function destroyChart(name) {
 
 async function refreshCharts() {
     const params = getDateParams();
+
+    // Daily by Vehicle (stacked bar)
+    destroyChart('dailyVehicle');
+    const dailyData = await loadChartData('/api/analytics/daily-by-vehicle', params);
+    if (dailyData.labels?.length > 0 && dailyData.datasets?.length > 0) {
+        charts.dailyVehicle = createStackedBarChart('dailyVehicleChart', dailyData.labels, dailyData.datasets);
+    }
 
     // By Plaza
     destroyChart('plaza');

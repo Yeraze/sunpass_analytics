@@ -345,6 +345,39 @@ async def get_spending_by_day_of_week(
         await db.close()
 
 
+async def get_daily_spending_by_vehicle(
+    start_date: str | None = None, end_date: str | None = None
+) -> list[dict[str, Any]]:
+    """Get daily spending broken down by vehicle for stacked bar chart."""
+    db = await get_db()
+    try:
+        conditions = ["t.amount > 0"]
+        params: list[Any] = []
+        if start_date:
+            conditions.append("t.transaction_date >= ?")
+            params.append(start_date)
+        if end_date:
+            conditions.append("t.transaction_date <= ?")
+            params.append(end_date)
+        where = f"WHERE {' AND '.join(conditions)}"
+        cursor = await db.execute(
+            f"""SELECT date(t.transaction_date) as day,
+                t.vehicle_id,
+                COALESCE(v.friendly_name, v.license_plate, t.vehicle_id) as vehicle_label,
+                SUM(t.amount) as total
+            FROM transactions t
+            LEFT JOIN vehicles v ON t.vehicle_id = v.vehicle_id
+            {where}
+            GROUP BY day, t.vehicle_id
+            ORDER BY day""",
+            params,
+        )
+        rows = await cursor.fetchall()
+        return [dict(row) for row in rows]
+    finally:
+        await db.close()
+
+
 async def get_dashboard_summary() -> dict[str, Any]:
     db = await get_db()
     try:

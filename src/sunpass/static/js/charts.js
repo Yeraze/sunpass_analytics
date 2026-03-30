@@ -113,6 +113,64 @@ function createPieChart(canvasId, labels, data, label) {
     });
 }
 
+function createStackedBarChart(canvasId, labels, datasets) {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return null;
+
+    const chartDatasets = datasets.map((ds, i) => ({
+        label: ds.label,
+        data: ds.data,
+        backgroundColor: CHART_COLORS[i % CHART_COLORS.length],
+        borderWidth: 0,
+        borderRadius: 2,
+    }));
+
+    return new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: chartDatasets,
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    onClick: function(e, legendItem, legend) {
+                        const index = legendItem.datasetIndex;
+                        const ci = legend.chart;
+                        const meta = ci.getDatasetMeta(index);
+                        meta.hidden = meta.hidden === null ? !ci.data.datasets[index].hidden : null;
+                        ci.update();
+                    },
+                    labels: {
+                        usePointStyle: true,
+                        pointStyle: 'rect',
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => `${ctx.dataset.label}: $${ctx.parsed.y.toFixed(2)}`
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    stacked: true,
+                },
+                y: {
+                    stacked: true,
+                    ticks: {
+                        callback: (val) => '$' + val.toFixed(0)
+                    }
+                }
+            }
+        }
+    });
+}
+
 async function loadChartData(url, params = {}) {
     const query = new URLSearchParams(params).toString();
     const fullUrl = query ? `${url}?${query}` : url;
