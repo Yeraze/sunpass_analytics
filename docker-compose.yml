@@ -1,0 +1,13 @@
+services:
+  sunpass:
+    build: .
+    ports:
+      - "9180:8080"
+    environment:
+      - SUNPASS_USERNAME=${SUNPASS_USERNAME}
+      - SUNPASS_PASSWORD=${SUNPASS_PASSWORD}
+      - SUNPASS_SCRAPE_SCHEDULE=${SUNPASS_SCRAPE_SCHEDULE:-0 6 * * *}
+      - SUNPASS_DATA_DIR=/app/data
+    volumes:
+      - ./data:/app/data
+    restart: unless-stopped

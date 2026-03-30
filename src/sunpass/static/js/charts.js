@@ -1,0 +1,121 @@
+const CHART_COLORS = [
+    '#004b87', '#f7941d', '#2e7d32', '#c62828', '#6a1b9a',
+    '#00838f', '#ef6c00', '#4527a0', '#ad1457', '#00695c',
+    '#1565c0', '#ff8f00', '#6d4c41', '#546e7a', '#d84315'
+];
+
+function createBarChart(canvasId, labels, data, label, horizontal = false) {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return null;
+
+    return new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: label,
+                data: data,
+                backgroundColor: CHART_COLORS.slice(0, labels.length),
+                borderWidth: 0,
+                borderRadius: 4,
+            }]
+        },
+        options: {
+            indexAxis: horizontal ? 'y' : 'x',
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => `$${ctx.parsed[horizontal ? 'x' : 'y'].toFixed(2)}`
+                    }
+                }
+            },
+            scales: {
+                [horizontal ? 'x' : 'y']: {
+                    ticks: {
+                        callback: (val) => '$' + val.toFixed(0)
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createLineChart(canvasId, labels, data, label) {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return null;
+
+    return new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: label,
+                data: data,
+                borderColor: '#004b87',
+                backgroundColor: 'rgba(0, 75, 135, 0.1)',
+                fill: true,
+                tension: 0.3,
+                pointRadius: 4,
+                pointHoverRadius: 6,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => `$${ctx.parsed.y.toFixed(2)}`
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    ticks: {
+                        callback: (val) => '$' + val.toFixed(0)
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createPieChart(canvasId, labels, data, label) {
+    const ctx = document.getElementById(canvasId);
+    if (!ctx) return null;
+
+    return new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: label,
+                data: data,
+                backgroundColor: CHART_COLORS.slice(0, labels.length),
+                borderWidth: 2,
+                borderColor: '#fff',
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => `${ctx.label}: $${ctx.parsed.toFixed(2)}`
+                    }
+                }
+            }
+        }
+    });
+}
+
+async function loadChartData(url, params = {}) {
+    const query = new URLSearchParams(params).toString();
+    const fullUrl = query ? `${url}?${query}` : url;
+    const response = await fetch(fullUrl);
+    return await response.json();
+}

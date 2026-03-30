@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block title %}Analytics - SunPass{% endblock %}
+{% block content %}
+<h4 class="mb-3">Analytics</h4>
+
+<div class="filter-bar mb-4">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-3">
+            <label class="form-label">From Date</label>
+            <input type="date" class="form-control" id="analytics-start" onchange="refreshCharts()">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">To Date</label>
+            <input type="date" class="form-control" id="analytics-end" onchange="refreshCharts()">
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <div class="chart-container" style="height: 400px;">
+            <h6>Spending by Road/Plaza</h6>
+            <canvas id="plazaChart"></canvas>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="chart-container" style="height: 400px;">
+            <h6>Spending by Vehicle</h6>
+            <canvas id="vehicleChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="chart-container" style="height: 350px;">
+            <h6>Monthly Spending</h6>
+            <canvas id="monthlyChart"></canvas>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="chart-container" style="height: 350px;">
+            <h6>Spending by Day of Week</h6>
+            <canvas id="dowChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="chart-container" style="height: 350px;">
+            <h6>Spending by Transponder</h6>
+            <canvas id="transponderChart"></canvas>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="/static/js/charts.js"></script>
+<script>
+let charts = {};
+
+function getDateParams() {
+    const params = {};
+    const start = document.getElementById('analytics-start').value;
+    const end = document.getElementById('analytics-end').value;
+    if (start) params.start_date = start;
+    if (end) params.end_date = end;
+    return params;
+}
+
+function destroyChart(name) {
+    if (charts[name]) {
+        charts[name].destroy();
+        charts[name] = null;
+    }
+}
+
+async function refreshCharts() {
+    const params = getDateParams();
+
+    // By Plaza
+    destroyChart('plaza');
+    const plazaData = await loadChartData('/api/analytics/by-plaza', params);
+    if (plazaData.labels?.length > 0) {
+        charts.plaza = createBarChart('plazaChart', plazaData.labels, plazaData.values, 'Spending by Road', true);
+    }
+
+    // By Vehicle
+    destroyChart('vehicle');
+    const vehicleData = await loadChartData('/api/analytics/by-vehicle', params);
+    if (vehicleData.labels?.length > 0) {
+        charts.vehicle = createPieChart('vehicleChart', vehicleData.labels, vehicleData.values, 'Spending by Vehicle');
+    }
+
+    // By Month
+    destroyChart('monthly');
+    const monthData = await loadChartData('/api/analytics/by-month', params);
+    if (monthData.labels?.length > 0) {
+        charts.monthly = createLineChart('monthlyChart', monthData.labels, monthData.values, 'Monthly Spending');
+    }
+
+    // By Day of Week
+    destroyChart('dow');
+    const dowData = await loadChartData('/api/analytics/by-day-of-week', params);
+    if (dowData.labels?.length > 0) {
+        charts.dow = createBarChart('dowChart', dowData.labels, dowData.values, 'Spending by Day');
+    }
+
+    // By Transponder
+    destroyChart('transponder');
+    const transponderData = await loadChartData('/api/analytics/by-transponder', params);
+    if (transponderData.labels?.length > 0) {
+        charts.transponder = createPieChart('transponderChart', transponderData.labels, transponderData.values, 'Spending by Transponder');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', refreshCharts);
+</script>
+{% endblock %}

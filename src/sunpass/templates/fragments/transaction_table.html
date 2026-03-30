@@ -1,0 +1,42 @@
+<div class="table-container">
+    <div class="d-flex justify-content-between mb-2">
+        <small class="text-muted">{{ total_count }} transactions</small>
+    </div>
+    <table id="txn-table" class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Plaza/Road</th>
+                <th>Agency</th>
+                <th>Transponder</th>
+                <th>Type</th>
+                <th class="text-end">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for txn in transactions %}
+            <tr>
+                <td>{{ txn.transaction_date }}</td>
+                <td>{{ txn.plaza_name or '-' }}</td>
+                <td>{{ txn.agency or '-' }}</td>
+                <td>{{ txn.transponder_id or '-' }}</td>
+                <td>{{ txn.transaction_type or '-' }}</td>
+                <td class="text-end {% if txn.amount > 0 %}amount-positive{% else %}amount-negative{% endif %}">
+                    ${{ "%.2f"|format(txn.amount) }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+if ($.fn.DataTable.isDataTable('#txn-table')) {
+    $('#txn-table').DataTable().destroy();
+}
+$('#txn-table').DataTable({
+    order: [[0, 'desc']],
+    pageLength: 25,
+    language: { search: "Filter:" }
+});
+</script>

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Settings - SunPass{% endblock %}
+{% block content %}
+<h4 class="mb-3">Settings</h4>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="summary-card mb-4">
+            <h5>Scrape Control</h5>
+            <p class="text-muted">Schedule: <code>{{ schedule }}</code></p>
+            <button class="btn btn-scrape"
+                    hx-post="/api/scrape"
+                    hx-target="#scrape-result"
+                    hx-swap="innerHTML">
+                Run Scrape Now
+            </button>
+            <div id="scrape-result" class="mt-2"></div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="summary-card mb-4">
+            <h5>Database</h5>
+            <p class="text-muted">
+                Vehicles: {{ stats.vehicle_count }}<br>
+                Transponders: {{ stats.transponder_count }}<br>
+                Transactions: {{ stats.transaction_count }}
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="table-container">
+            <h5>Scrape History</h5>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Started</th>
+                        <th>Completed</th>
+                        <th>Status</th>
+                        <th>Transactions</th>
+                        <th>Vehicles</th>
+                        <th>Transponders</th>
+                        <th>Error</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td>{{ log.started_at }}</td>
+                        <td>{{ log.completed_at or '-' }}</td>
+                        <td>
+                            {% if log.status == 'success' %}
+                            <span class="badge bg-success">{{ log.status }}</span>
+                            {% elif log.status == 'running' %}
+                            <span class="badge bg-warning">{{ log.status }}</span>
+                            {% else %}
+                            <span class="badge bg-danger">{{ log.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ log.transactions_added }}</td>
+                        <td>{{ log.vehicles_added }}</td>
+                        <td>{{ log.transponders_added }}</td>
+                        <td><small class="text-danger">{{ log.error_message or '' }}</small></td>
+                    </tr>
+                    {% endfor %}
+                    {% if not logs %}
+                    <tr><td colspan="7" class="text-center text-muted">No scrape history yet.</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

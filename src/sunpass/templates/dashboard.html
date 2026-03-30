@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - SunPass{% endblock %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="summary-card">
+            <div class="label">This Month</div>
+            <div class="value">${{ "%.2f"|format(summary.month_total) }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="summary-card">
+            <div class="label">This Year</div>
+            <div class="value">${{ "%.2f"|format(summary.year_total) }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="summary-card">
+            <div class="label">Vehicles</div>
+            <div class="value">{{ summary.vehicle_count }}</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="summary-card">
+            <div class="label">Transponders</div>
+            <div class="value">{{ summary.transponder_count }}</div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Monthly Spending Trend</h5>
+            <button class="btn btn-scrape btn-sm"
+                    hx-post="/api/scrape"
+                    hx-swap="innerHTML"
+                    hx-target="#scrape-trigger-result">
+                Scrape Now
+            </button>
+            <span id="scrape-trigger-result"></span>
+        </div>
+        <div class="chart-container" style="height: 350px;">
+            <canvas id="monthlyChart"></canvas>
+        </div>
+    </div>
+</div>
+
+{% if summary.last_scrape %}
+<div class="row">
+    <div class="col-12">
+        <div class="summary-card">
+            <div class="label">Last Scrape</div>
+            <div>
+                <strong>{{ summary.last_scrape.status }}</strong>
+                &mdash; {{ summary.last_scrape.started_at }}
+                {% if summary.last_scrape.error_message %}
+                <br><small class="text-danger">{{ summary.last_scrape.error_message }}</small>
+                {% endif %}
+                {% if summary.last_scrape.transactions_added %}
+                <br><small class="text-muted">{{ summary.last_scrape.transactions_added }} transactions, {{ summary.last_scrape.vehicles_added }} vehicles, {{ summary.last_scrape.transponders_added }} transponders</small>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="/static/js/charts.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+    const data = await loadChartData('/api/analytics/by-month');
+    if (data.labels && data.labels.length > 0) {
+        createLineChart('monthlyChart', data.labels, data.values, 'Monthly Toll Spending');
+    }
+});
+</script>
+{% endblock %}

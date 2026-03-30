@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Vehicles & Transponders - SunPass{% endblock %}
+{% block content %}
+<h4 class="mb-3">Vehicles & Transponders</h4>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="table-container">
+            <h5>Vehicles</h5>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>License Plate</th>
+                        <th>State</th>
+                        <th>Make</th>
+                        <th>Model</th>
+                        <th>Year</th>
+                        <th>Color</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for v in vehicles %}
+                    <tr>
+                        <td><strong>{{ v.license_plate or v.vehicle_id }}</strong></td>
+                        <td>{{ v.license_state or '-' }}</td>
+                        <td>{{ v.make or '-' }}</td>
+                        <td>{{ v.model or '-' }}</td>
+                        <td>{{ v.year or '-' }}</td>
+                        <td>{{ v.color or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% if not vehicles %}
+                    <tr><td colspan="6" class="text-center text-muted">No vehicles found. Run a scrape first.</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="table-container">
+            <h5>Transponders</h5>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Transponder ID</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Vehicle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in transponders %}
+                    <tr>
+                        <td><strong>{{ t.transponder_id }}</strong></td>
+                        <td>{{ t.transponder_type or '-' }}</td>
+                        <td>
+                            {% if t.status == 'active' or t.status == 'Active' %}
+                            <span class="badge bg-success">{{ t.status }}</span>
+                            {% elif t.status %}
+                            <span class="badge bg-secondary">{{ t.status }}</span>
+                            {% else %}
+                            -
+                            {% endif %}
+                        </td>
+                        <td>{{ t.license_plate or t.vehicle_id or '-' }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% if not transponders %}
+                    <tr><td colspan="4" class="text-center text-muted">No transponders found. Run a scrape first.</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

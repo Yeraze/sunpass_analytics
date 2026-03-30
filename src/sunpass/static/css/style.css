@@ -1,0 +1,126 @@
+:root {
+    --sp-orange: #f7941d;
+    --sp-blue: #004b87;
+    --sp-dark: #1a1a2e;
+    --sp-light: #f8f9fa;
+}
+
+body {
+    background-color: #f0f2f5;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.navbar {
+    background-color: var(--sp-blue) !important;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    color: var(--sp-orange) !important;
+}
+
+.summary-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: transform 0.2s;
+}
+
+.summary-card:hover {
+    transform: translateY(-2px);
+}
+
+.summary-card .value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--sp-blue);
+}
+
+.summary-card .label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.chart-container {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 1.5rem;
+}
+
+.filter-bar {
+    background: white;
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 1.5rem;
+}
+
+.table-container {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+
+.scrape-status-badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.scrape-status-badge.idle {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.scrape-status-badge.running {
+    background-color: #fff3e0;
+    color: #e65100;
+    animation: pulse 1.5s infinite;
+}
+
+.scrape-status-badge.error {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+.btn-scrape {
+    background-color: var(--sp-orange);
+    border-color: var(--sp-orange);
+    color: white;
+    font-weight: 600;
+}
+
+.btn-scrape:hover {
+    background-color: #e8850f;
+    border-color: #e8850f;
+    color: white;
+}
+
+.log-entry {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #eee;
+}
+
+.log-entry:last-child {
+    border-bottom: none;
+}
+
+.amount-positive {
+    color: #c62828;
+}
+
+.amount-negative {
+    color: #2e7d32;
+}

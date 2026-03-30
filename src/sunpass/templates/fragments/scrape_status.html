@@ -1,0 +1,7 @@
+{% if is_scraping %}
+<span class="scrape-status-badge running">Scraping...</span>
+{% elif last_scrape and last_scrape.status == 'failed' %}
+<span class="scrape-status-badge error">Last scrape failed</span>
+{% else %}
+<span class="scrape-status-badge idle">Idle</span>
+{% endif %}
