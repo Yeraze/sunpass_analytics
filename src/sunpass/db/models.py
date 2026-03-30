@@ -5,6 +5,7 @@ SCHEMA_SQL = """
 CREATE TABLE IF NOT EXISTS vehicles (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     vehicle_id TEXT UNIQUE NOT NULL,
+    friendly_name TEXT,
     make TEXT,
     model TEXT,
     year TEXT,

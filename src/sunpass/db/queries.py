@@ -8,6 +8,7 @@ from sunpass.db.models import get_db
 
 async def upsert_vehicle(
     vehicle_id: str,
+    friendly_name: str | None = None,
     make: str | None = None,
     model: str | None = None,
     year: str | None = None,
@@ -19,13 +20,13 @@ async def upsert_vehicle(
     db = await get_db()
     try:
         cursor = await db.execute(
-            """INSERT INTO vehicles (vehicle_id, make, model, year, color, license_plate, license_state)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            """INSERT INTO vehicles (vehicle_id, friendly_name, make, model, year, color, license_plate, license_state)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(vehicle_id) DO UPDATE SET
-                make=excluded.make, model=excluded.model, year=excluded.year,
-                color=excluded.color, license_plate=excluded.license_plate,
+                friendly_name=excluded.friendly_name, make=excluded.make, model=excluded.model,
+                year=excluded.year, color=excluded.color, license_plate=excluded.license_plate,
                 license_state=excluded.license_state, updated_at=CURRENT_TIMESTAMP""",
-            (vehicle_id, make, model, year, color, license_plate, license_state),
+            (vehicle_id, friendly_name, make, model, year, color, license_plate, license_state),
         )
         await db.commit()
         return cursor.rowcount > 0
@@ -242,7 +243,7 @@ async def get_spending_by_vehicle(
             params.append(end_date)
         where = f"WHERE {' AND '.join(conditions)}"
         cursor = await db.execute(
-            f"""SELECT t.vehicle_id, v.license_plate, v.make, v.model,
+            f"""SELECT t.vehicle_id, v.license_plate, v.friendly_name, v.make, v.model,
                 SUM(t.amount) as total, COUNT(*) as count
             FROM transactions t
             LEFT JOIN vehicles v ON t.vehicle_id = v.vehicle_id

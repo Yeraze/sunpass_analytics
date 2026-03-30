@@ -10,27 +10,21 @@
             <table class="table table-striped table-hover">
                 <thead>
                     <tr>
+                        <th>Name</th>
                         <th>License Plate</th>
-                        <th>State</th>
-                        <th>Make</th>
-                        <th>Model</th>
-                        <th>Year</th>
-                        <th>Color</th>
+                        <th>Transponder ID</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for v in vehicles %}
                     <tr>
-                        <td><strong>{{ v.license_plate or v.vehicle_id }}</strong></td>
-                        <td>{{ v.license_state or '-' }}</td>
-                        <td>{{ v.make or '-' }}</td>
-                        <td>{{ v.model or '-' }}</td>
-                        <td>{{ v.year or '-' }}</td>
-                        <td>{{ v.color or '-' }}</td>
+                        <td><strong>{{ v.friendly_name or '-' }}</strong></td>
+                        <td>{{ v.license_plate or '-' }}</td>
+                        <td><code>{{ v.vehicle_id }}</code></td>
                     </tr>
                     {% endfor %}
                     {% if not vehicles %}
-                    <tr><td colspan="6" class="text-center text-muted">No vehicles found. Run a scrape first.</td></tr>
+                    <tr><td colspan="3" class="text-center text-muted">No vehicles found. Run a scrape first.</td></tr>
                     {% endif %}
                 </tbody>
             </table>

@@ -36,10 +36,12 @@ async def api_by_vehicle(start_date: str | None = None, end_date: str | None = N
     data = await get_spending_by_vehicle(start_date, end_date)
     labels = []
     for r in data:
-        if r.get("license_plate"):
-            labels.append(f"{r['license_plate']} ({r.get('make', '')} {r.get('model', '')})")
-        else:
-            labels.append(r["vehicle_id"] or "Unknown")
+        name = r.get("friendly_name") or r.get("license_plate") or r.get("vehicle_id") or "Unknown"
+        if r.get("license_plate") and r.get("friendly_name"):
+            name = f"{r['friendly_name']} ({r['license_plate']})"
+        elif r.get("license_plate"):
+            name = r["license_plate"]
+        labels.append(name)
     return JSONResponse({
         "labels": labels,
         "values": [r["total"] for r in data],

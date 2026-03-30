@@ -19,6 +19,41 @@ async def scrape_vehicles_and_transponders(page: Page) -> tuple[int, int]:
     await page.wait_for_timeout(3000)
     await take_screenshot(page, "vehicles_page")
 
+    page_num = 1
+    while True:
+        logger.info("Parsing vehicles page %d", page_num)
+        v_added, t_added = await _parse_vehicles_page(page)
+        vehicles_added += v_added
+        transponders_added += t_added
+
+        # Check for next page link
+        next_btn = await page.query_selector(
+            'a.next, .pagination .next a, a[aria-label="Next"], '
+            'a:has-text("Next"), a:has-text("next"), li.next a'
+        )
+        if next_btn:
+            is_disabled = await next_btn.get_attribute("class") or ""
+            if "disabled" in is_disabled:
+                break
+            await next_btn.click()
+            await page.wait_for_load_state("networkidle", timeout=30000)
+            await page.wait_for_timeout(2000)
+            page_num += 1
+        else:
+            break
+
+    logger.info(
+        "Vehicles scraped: %d new/updated, Transponders: %d new/updated",
+        vehicles_added, transponders_added,
+    )
+    return vehicles_added, transponders_added
+
+
+async def _parse_vehicles_page(page: Page) -> tuple[int, int]:
+    """Parse a single page of vehicles/transponders. Returns (vehicles_added, transponders_added)."""
+    vehicles_added = 0
+    transponders_added = 0
+
     # SunPass footable columns:
     # 0: Transponder Number
     # 1: Transponder Type
@@ -49,17 +84,13 @@ async def scrape_vehicles_and_transponders(page: Page) -> tuple[int, int]:
                 transponder_id, transponder_type, status, plate_text, friendly_name,
             )
 
-            # Use transponder_id as vehicle_id since SunPass links them 1:1
             vehicle_id = transponder_id
-
-            # Parse plate and state if present (format: "PLATE" or could include state)
             license_plate = plate_text if plate_text else None
-            license_state = None
 
             added = await upsert_vehicle(
                 vehicle_id=vehicle_id,
+                friendly_name=friendly_name or None,
                 license_plate=license_plate,
-                license_state=license_state,
             )
             if added:
                 vehicles_added += 1
@@ -77,8 +108,4 @@ async def scrape_vehicles_and_transponders(page: Page) -> tuple[int, int]:
             logger.error("Error parsing vehicle row: %s", e)
             continue
 
-    logger.info(
-        "Vehicles scraped: %d new/updated, Transponders: %d new/updated",
-        vehicles_added, transponders_added,
-    )
     return vehicles_added, transponders_added

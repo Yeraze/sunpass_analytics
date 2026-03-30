@@ -129,9 +129,9 @@ async def _parse_transaction_page(page: Page) -> int:
             posted_date = _parse_date(posted_date_str)
             txn_date = _parse_date(txn_date_str)
 
-            # Combine transaction date with time
+            # Combine transaction date with time in ISO format
             if txn_date and txn_time_str:
-                txn_datetime = f"{txn_date} {txn_time_str}"
+                txn_datetime = _combine_date_time(txn_date, txn_time_str)
             elif txn_date:
                 txn_datetime = txn_date
             else:
@@ -220,6 +220,19 @@ def _parse_date(date_str: str) -> str | None:
         return dt.strftime("%Y-%m-%d")
     except (ValueError, IndexError):
         return None
+
+
+def _combine_date_time(date_iso: str, time_str: str) -> str:
+    """Combine YYYY-MM-DD date with '05:59:57 PM' time into ISO datetime."""
+    time_str = time_str.strip()
+    try:
+        if "AM" in time_str.upper() or "PM" in time_str.upper():
+            t = datetime.strptime(time_str, "%I:%M:%S %p")
+        else:
+            t = datetime.strptime(time_str, "%H:%M:%S")
+        return f"{date_iso} {t.strftime('%H:%M:%S')}"
+    except ValueError:
+        return f"{date_iso} {time_str}"
 
 
 def _parse_amount(amount_str: str) -> float | None:
