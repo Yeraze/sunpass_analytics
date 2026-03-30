@@ -112,24 +112,28 @@ async def get_transactions(
         conditions = []
         params: list[Any] = []
         if start_date:
-            conditions.append("transaction_date >= ?")
+            conditions.append("t.transaction_date >= ?")
             params.append(start_date)
         if end_date:
-            conditions.append("transaction_date <= ?")
+            conditions.append("t.transaction_date <= ?")
             params.append(end_date)
         if vehicle_id:
-            conditions.append("vehicle_id = ?")
+            conditions.append("t.vehicle_id = ?")
             params.append(vehicle_id)
         if transponder_id:
-            conditions.append("transponder_id = ?")
+            conditions.append("t.transponder_id = ?")
             params.append(transponder_id)
         if plaza_name:
-            conditions.append("plaza_name = ?")
+            conditions.append("t.plaza_name = ?")
             params.append(plaza_name)
 
         where = f"WHERE {' AND '.join(conditions)}" if conditions else ""
-        query = f"""SELECT * FROM transactions {where}
-                    ORDER BY transaction_date DESC LIMIT ? OFFSET ?"""
+        query = f"""SELECT t.*,
+                    COALESCE(v.friendly_name, v.license_plate, t.vehicle_id) as vehicle_label
+                    FROM transactions t
+                    LEFT JOIN vehicles v ON t.vehicle_id = v.vehicle_id
+                    {where}
+                    ORDER BY t.transaction_date DESC LIMIT ? OFFSET ?"""
         params.extend([limit, offset])
 
         cursor = await db.execute(query, params)
@@ -191,7 +195,7 @@ async def get_transponders() -> list[dict[str, Any]]:
     db = await get_db()
     try:
         cursor = await db.execute(
-            """SELECT t.*, v.license_plate, v.make, v.model
+            """SELECT t.*, v.friendly_name, v.license_plate, v.make, v.model
             FROM transponders t
             LEFT JOIN vehicles v ON t.vehicle_id = v.vehicle_id
             ORDER BY t.transponder_id"""
@@ -272,8 +276,10 @@ async def get_spending_by_transponder(
             params.append(end_date)
         where = f"WHERE {' AND '.join(conditions)}"
         cursor = await db.execute(
-            f"""SELECT t.transponder_id, SUM(t.amount) as total, COUNT(*) as count
+            f"""SELECT t.transponder_id, v.friendly_name, v.license_plate,
+                SUM(t.amount) as total, COUNT(*) as count
             FROM transactions t
+            LEFT JOIN vehicles v ON t.transponder_id = v.vehicle_id
             {where}
             GROUP BY t.transponder_id ORDER BY total DESC""",
             params,
@@ -384,19 +390,33 @@ async def get_dashboard_summary() -> dict[str, Any]:
         await db.close()
 
 
-async def get_filter_options() -> dict[str, list[str]]:
-    """Get distinct values for filter dropdowns."""
+async def get_filter_options() -> dict[str, list]:
+    """Get distinct values for filter dropdowns with friendly labels."""
     db = await get_db()
     try:
         cursor = await db.execute(
-            "SELECT DISTINCT vehicle_id FROM transactions WHERE vehicle_id IS NOT NULL ORDER BY vehicle_id"
+            """SELECT DISTINCT t.vehicle_id, v.friendly_name, v.license_plate
+            FROM transactions t
+            LEFT JOIN vehicles v ON t.vehicle_id = v.vehicle_id
+            WHERE t.vehicle_id IS NOT NULL
+            ORDER BY COALESCE(v.friendly_name, v.license_plate, t.vehicle_id)"""
         )
-        vehicles = [row["vehicle_id"] for row in await cursor.fetchall()]
+        vehicles = []
+        for row in await cursor.fetchall():
+            label = row["friendly_name"] or row["license_plate"] or row["vehicle_id"]
+            vehicles.append({"id": row["vehicle_id"], "label": label})
 
         cursor = await db.execute(
-            "SELECT DISTINCT transponder_id FROM transactions WHERE transponder_id IS NOT NULL ORDER BY transponder_id"
+            """SELECT DISTINCT t.transponder_id, v.friendly_name, v.license_plate
+            FROM transactions t
+            LEFT JOIN vehicles v ON t.transponder_id = v.vehicle_id
+            WHERE t.transponder_id IS NOT NULL
+            ORDER BY COALESCE(v.friendly_name, v.license_plate, t.transponder_id)"""
         )
-        transponders = [row["transponder_id"] for row in await cursor.fetchall()]
+        transponders = []
+        for row in await cursor.fetchall():
+            label = row["friendly_name"] or row["license_plate"] or row["transponder_id"]
+            transponders.append({"id": row["transponder_id"], "label": label})
 
         cursor = await db.execute(
             "SELECT DISTINCT plaza_name FROM transactions WHERE plaza_name IS NOT NULL ORDER BY plaza_name"

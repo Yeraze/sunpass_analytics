@@ -52,8 +52,12 @@ async def api_by_vehicle(start_date: str | None = None, end_date: str | None = N
 @router.get("/api/analytics/by-transponder")
 async def api_by_transponder(start_date: str | None = None, end_date: str | None = None):
     data = await get_spending_by_transponder(start_date, end_date)
+    labels = []
+    for r in data:
+        label = r.get("friendly_name") or r.get("license_plate") or r.get("transponder_id") or "Unknown"
+        labels.append(label)
     return JSONResponse({
-        "labels": [r["transponder_id"] or "Unknown" for r in data],
+        "labels": labels,
         "values": [r["total"] for r in data],
         "counts": [r["count"] for r in data],
     })

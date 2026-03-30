@@ -19,7 +19,7 @@
                 <select class="form-select" name="vehicle_id">
                     <option value="">All Vehicles</option>
                     {% for v in filters.vehicles %}
-                    <option value="{{ v }}" {% if vehicle_id == v %}selected{% endif %}>{{ v }}</option>
+                    <option value="{{ v.id }}" {% if vehicle_id == v.id %}selected{% endif %}>{{ v.label }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -28,7 +28,7 @@
                 <select class="form-select" name="transponder_id">
                     <option value="">All Transponders</option>
                     {% for t in filters.transponders %}
-                    <option value="{{ t }}" {% if transponder_id == t %}selected{% endif %}>{{ t }}</option>
+                    <option value="{{ t.id }}" {% if transponder_id == t.id %}selected{% endif %}>{{ t.label }}</option>
                     {% endfor %}
                 </select>
             </div>

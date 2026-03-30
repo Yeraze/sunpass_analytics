@@ -8,7 +8,7 @@
                 <th>Date</th>
                 <th>Plaza/Road</th>
                 <th>Agency</th>
-                <th>Transponder</th>
+                <th>Vehicle</th>
                 <th>Type</th>
                 <th class="text-end">Amount</th>
             </tr>
@@ -19,7 +19,7 @@
                 <td>{{ txn.transaction_date }}</td>
                 <td>{{ txn.plaza_name or '-' }}</td>
                 <td>{{ txn.agency or '-' }}</td>
-                <td>{{ txn.transponder_id or '-' }}</td>
+                <td>{{ txn.vehicle_label or '-' }}</td>
                 <td>{{ txn.transaction_type or '-' }}</td>
                 <td class="text-end {% if txn.amount > 0 %}amount-positive{% else %}amount-negative{% endif %}">
                     ${{ "%.2f"|format(txn.amount) }}

@@ -98,15 +98,14 @@ async def export_transactions(
 
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow(["Date", "Posted Date", "Plaza/Road", "Agency", "Transponder", "Vehicle", "Type", "Amount"])
+    writer.writerow(["Date", "Posted Date", "Plaza/Road", "Agency", "Vehicle", "Type", "Amount"])
     for txn in txns:
         writer.writerow([
             txn.get("transaction_date", ""),
             txn.get("posted_date", ""),
             txn.get("plaza_name", ""),
             txn.get("agency", ""),
-            txn.get("transponder_id", ""),
-            txn.get("vehicle_id", ""),
+            txn.get("vehicle_label", "") or txn.get("vehicle_id", ""),
             txn.get("transaction_type", ""),
             txn.get("amount", ""),
         ])

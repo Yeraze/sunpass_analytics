@@ -45,10 +45,10 @@
                 <tbody>
                     {% for t in transponders %}
                     <tr>
-                        <td><strong>{{ t.transponder_id }}</strong></td>
+                        <td><strong>{{ t.friendly_name or t.license_plate or t.transponder_id }}</strong></td>
                         <td>{{ t.transponder_type or '-' }}</td>
                         <td>
-                            {% if t.status == 'active' or t.status == 'Active' %}
+                            {% if t.status and t.status.upper() == 'ACTIVE' %}
                             <span class="badge bg-success">{{ t.status }}</span>
                             {% elif t.status %}
                             <span class="badge bg-secondary">{{ t.status }}</span>
@@ -56,7 +56,7 @@
                             -
                             {% endif %}
                         </td>
-                        <td>{{ t.license_plate or t.vehicle_id or '-' }}</td>
+                        <td>{{ t.friendly_name or t.license_plate or '-' }}</td>
                     </tr>
                     {% endfor %}
                     {% if not transponders %}
