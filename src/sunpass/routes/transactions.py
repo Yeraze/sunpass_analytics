@@ -3,12 +3,11 @@ import io
 
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse, StreamingResponse
-from fastapi.templating import Jinja2Templates
 
 from sunpass.db.queries import get_filter_options, get_transaction_count, get_transactions
+from sunpass.routes import templates
 
 router = APIRouter()
-templates = Jinja2Templates(directory="src/sunpass/templates")
 
 
 @router.get("/transactions", response_class=HTMLResponse)
@@ -36,9 +35,8 @@ async def transactions_page(
         plaza_name=plaza_name,
     )
     return templates.TemplateResponse(
-        "transactions.html",
+        request, "transactions.html",
         {
-            "request": request,
             "transactions": txns,
             "total_count": total_count,
             "filters": filters,
@@ -76,8 +74,8 @@ async def transaction_table_fragment(
         plaza_name=plaza_name,
     )
     return templates.TemplateResponse(
-        "fragments/transaction_table.html",
-        {"request": request, "transactions": txns, "total_count": total_count},
+        request, "fragments/transaction_table.html",
+        {"transactions": txns, "total_count": total_count},
     )
 
 

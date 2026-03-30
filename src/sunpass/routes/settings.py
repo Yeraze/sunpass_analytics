@@ -2,14 +2,13 @@ import asyncio
 
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.templating import Jinja2Templates
 
 from sunpass.config import SCRAPE_SCHEDULE
 from sunpass.db.queries import get_dashboard_summary, get_scrape_logs, get_transaction_count
+from sunpass.routes import templates
 from sunpass.scraper.run import is_scraping, run_scrape
 
 router = APIRouter()
-templates = Jinja2Templates(directory="src/sunpass/templates")
 
 
 @router.get("/settings", response_class=HTMLResponse)
@@ -18,9 +17,8 @@ async def settings_page(request: Request):
     summary = await get_dashboard_summary()
     txn_count = await get_transaction_count()
     return templates.TemplateResponse(
-        "settings.html",
+        request, "settings.html",
         {
-            "request": request,
             "logs": logs,
             "schedule": SCRAPE_SCHEDULE,
             "stats": {

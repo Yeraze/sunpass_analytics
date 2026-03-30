@@ -34,29 +34,29 @@ async def scrape_transactions(page: Page, from_date: str | None = None) -> int:
     await page.goto(TRANSACTIONS_URL, wait_until="networkidle", timeout=30000)
     await page.wait_for_timeout(3000)
 
-    # Fill date range in the search form
-    start_input = await page.query_selector(
-        'input[name="startDate"], input[name="fromDate"], #startDate, #fromDate'
-    )
-    end_input = await page.query_selector(
-        'input[name="endDate"], input[name="toDate"], #endDate, #toDate'
-    )
+    # Fill date range — SunPass uses startDateAll / endDateAll fields
+    start_input = await page.query_selector('#startDateAll1, input[name="startDateAll"]')
+    end_input = await page.query_selector('#endDateAll1, input[name="endDateAll"]')
 
     if start_input:
         await start_input.fill("")
         await start_input.fill(from_date_mm)
+        logger.info("Set start date: %s", from_date_mm)
     if end_input:
         await end_input.fill("")
         await end_input.fill(to_date_mm)
+        logger.info("Set end date: %s", to_date_mm)
 
-    # Submit search
-    search_btn = await page.query_selector(
-        'button[type="submit"], input[type="submit"], .search-btn, #searchBtn, button:has-text("Search")'
+    # Click the VIEW button to search
+    view_btn = await page.query_selector(
+        'input[name="btnView"], button:has-text("VIEW"), button:has-text("View")'
     )
-    if search_btn:
-        await search_btn.click()
-        await page.wait_for_load_state("networkidle", timeout=30000)
+    if view_btn:
+        await view_btn.click()
+        await page.wait_for_load_state("networkidle", timeout=60000)
         await page.wait_for_timeout(3000)
+    else:
+        logger.warning("VIEW button not found")
 
     await take_screenshot(page, "transactions_page")
 

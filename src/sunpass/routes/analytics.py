@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse, JSONResponse
-from fastapi.templating import Jinja2Templates
 
 from sunpass.db.queries import (
     get_spending_by_day_of_week,
@@ -9,16 +8,16 @@ from sunpass.db.queries import (
     get_spending_by_transponder,
     get_spending_by_vehicle,
 )
+from sunpass.routes import templates
 
 router = APIRouter()
-templates = Jinja2Templates(directory="src/sunpass/templates")
 
 
 @router.get("/analytics", response_class=HTMLResponse)
 async def analytics_page(request: Request):
     return templates.TemplateResponse(
-        "analytics.html",
-        {"request": request, "active_page": "analytics"},
+        request, "analytics.html",
+        {"active_page": "analytics"},
     )
 
 

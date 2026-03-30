@@ -1,10 +1,13 @@
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+
+PACKAGE_DIR = Path(__file__).resolve().parent
 
 from sunpass.config import SCRAPE_SCHEDULE
 from sunpass.db.models import init_db
@@ -60,7 +63,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="SunPass Dashboard", lifespan=lifespan)
 
-app.mount("/static", StaticFiles(directory="src/sunpass/static"), name="static")
+app.mount("/static", StaticFiles(directory=str(PACKAGE_DIR / "static")), name="static")
 
 app.include_router(dashboard.router)
 app.include_router(transactions.router)
