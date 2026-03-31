@@ -13,6 +13,13 @@
             <label class="form-label">To Date</label>
             <input type="date" class="form-control" id="analytics-end" onchange="refreshCharts()">
         </div>
+        <div class="col-md-6 d-flex align-items-end gap-2">
+            <button class="btn btn-outline-secondary btn-sm" onclick="setQuickRange(7)">Last 7 days</button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="setQuickRange(14)">Last 14 days</button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="setQuickRange(30)">Last 30 days</button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="setQuickRange(90)">Last 90 days</button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="clearRange()">All</button>
+        </div>
     </div>
 </div>
 
@@ -83,6 +90,21 @@ function getDateParams() {
     if (start) params.start_date = start;
     if (end) params.end_date = end;
     return params;
+}
+
+function setQuickRange(days) {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(end.getDate() - days);
+    document.getElementById('analytics-start').value = start.toISOString().split('T')[0];
+    document.getElementById('analytics-end').value = end.toISOString().split('T')[0];
+    refreshCharts();
+}
+
+function clearRange() {
+    document.getElementById('analytics-start').value = '';
+    document.getElementById('analytics-end').value = '';
+    refreshCharts();
 }
 
 function destroyChart(name) {
