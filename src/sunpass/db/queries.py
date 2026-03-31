@@ -206,6 +206,84 @@ async def get_transponders() -> list[dict[str, Any]]:
         await db.close()
 
 
+def _extract_road_name(plaza_name: str) -> str:
+    """Extract road/highway name from a plaza name.
+
+    Examples:
+        'I-95 MIAMIGARDENS EXLN NB MP14' -> 'I-95'
+        'SR869 DEERFIELD A MAIN SB MP20' -> 'SR-869'
+        'SR 528 BEACHLINE' -> 'SR-528'
+        'SR91 45TH STREET MAIN NB MP104' -> 'SR-91 (Turnpike)'
+        'PAYMENT & ADJUSTMENTS' -> 'Other'
+    """
+    import re
+    if not plaza_name:
+        return "Other"
+
+    # Interstate: I-XX or I-XXX
+    m = re.match(r"(I-\d+)", plaza_name)
+    if m:
+        return m.group(1)
+
+    # State road with space: SR 528
+    m = re.match(r"SR\s+(\d+)", plaza_name)
+    if m:
+        num = m.group(1)
+        label = f"SR-{num}"
+        if num == "91":
+            label += " (Turnpike)"
+        return label
+
+    # State road no space: SR869, SR112
+    m = re.match(r"SR(\d+)", plaza_name)
+    if m:
+        num = m.group(1)
+        label = f"SR-{num}"
+        if num == "91":
+            label += " (Turnpike)"
+        return label
+
+    return "Other"
+
+
+async def get_spending_by_road(
+    start_date: str | None = None, end_date: str | None = None
+) -> list[dict[str, Any]]:
+    """Get spending grouped by road/highway."""
+    db = await get_db()
+    try:
+        conditions = ["amount > 0"]
+        params: list[Any] = []
+        if start_date:
+            conditions.append("transaction_date >= ?")
+            params.append(start_date)
+        if end_date:
+            conditions.append("transaction_date <= ?")
+            params.append(end_date)
+        where = f"WHERE {' AND '.join(conditions)}"
+        cursor = await db.execute(
+            f"""SELECT plaza_name, SUM(amount) as total, COUNT(*) as count
+            FROM transactions {where}
+            GROUP BY plaza_name ORDER BY total DESC""",
+            params,
+        )
+        rows = await cursor.fetchall()
+
+        # Aggregate by road
+        road_totals: dict[str, dict] = {}
+        for row in rows:
+            road = _extract_road_name(row["plaza_name"])
+            if road not in road_totals:
+                road_totals[road] = {"road": road, "total": 0, "count": 0}
+            road_totals[road]["total"] += row["total"]
+            road_totals[road]["count"] += row["count"]
+
+        result = sorted(road_totals.values(), key=lambda x: x["total"], reverse=True)
+        return result
+    finally:
+        await db.close()
+
+
 async def get_spending_by_plaza(
     start_date: str | None = None, end_date: str | None = None
 ) -> list[dict[str, Any]]:

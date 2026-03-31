@@ -6,6 +6,7 @@ from sunpass.db.queries import (
     get_spending_by_day_of_week,
     get_spending_by_month,
     get_spending_by_plaza,
+    get_spending_by_road,
     get_spending_by_transponder,
     get_spending_by_vehicle,
 )
@@ -27,6 +28,16 @@ async def api_by_plaza(start_date: str | None = None, end_date: str | None = Non
     data = await get_spending_by_plaza(start_date, end_date)
     return JSONResponse({
         "labels": [r["plaza_name"] or "Unknown" for r in data],
+        "values": [r["total"] for r in data],
+        "counts": [r["count"] for r in data],
+    })
+
+
+@router.get("/api/analytics/by-road")
+async def api_by_road(start_date: str | None = None, end_date: str | None = None):
+    data = await get_spending_by_road(start_date, end_date)
+    return JSONResponse({
+        "labels": [r["road"] for r in data],
         "values": [r["total"] for r in data],
         "counts": [r["count"] for r in data],
     })

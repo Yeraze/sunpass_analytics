@@ -26,16 +26,22 @@
 </div>
 
 <div class="row mb-4">
-    <div class="col-md-8">
+    <div class="col-md-4">
         <div class="chart-container" style="height: 400px;">
-            <h6>Spending by Road/Plaza</h6>
-            <canvas id="plazaChart"></canvas>
+            <h6>Spending by Road</h6>
+            <canvas id="roadChart"></canvas>
         </div>
     </div>
     <div class="col-md-4">
         <div class="chart-container" style="height: 400px;">
             <h6>Spending by Vehicle</h6>
             <canvas id="vehicleChart"></canvas>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="chart-container" style="height: 400px;">
+            <h6>Spending by Toll Plaza</h6>
+            <canvas id="plazaChart"></canvas>
         </div>
     </div>
 </div>
@@ -96,11 +102,18 @@ async function refreshCharts() {
         charts.dailyVehicle = createStackedBarChart('dailyVehicleChart', dailyData.labels, dailyData.datasets);
     }
 
-    // By Plaza
+    // By Road (pie)
+    destroyChart('road');
+    const roadData = await loadChartData('/api/analytics/by-road', params);
+    if (roadData.labels?.length > 0) {
+        charts.road = createPieChart('roadChart', roadData.labels, roadData.values, 'Spending by Road');
+    }
+
+    // By Plaza (detailed)
     destroyChart('plaza');
     const plazaData = await loadChartData('/api/analytics/by-plaza', params);
     if (plazaData.labels?.length > 0) {
-        charts.plaza = createBarChart('plazaChart', plazaData.labels, plazaData.values, 'Spending by Road', true);
+        charts.plaza = createBarChart('plazaChart', plazaData.labels, plazaData.values, 'Spending by Plaza', true);
     }
 
     // By Vehicle
