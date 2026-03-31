@@ -9,10 +9,49 @@ from sunpass.db.queries import (
     get_spending_by_road,
     get_spending_by_transponder,
     get_spending_by_vehicle,
+    get_vehicles,
 )
 from sunpass.routes import templates
 
+CHART_COLORS = [
+    '#004b87', '#f7941d', '#2e7d32', '#c62828', '#6a1b9a',
+    '#00838f', '#ef6c00', '#4527a0', '#ad1457', '#00695c',
+    '#1565c0', '#ff8f00', '#6d4c41', '#546e7a', '#d84315',
+]
+
 router = APIRouter()
+
+
+@router.get("/api/color-map")
+async def api_color_map():
+    """Return a stable label -> color mapping for all known entities."""
+    color_map = {}
+    idx = 0
+
+    # Vehicles — these are the most important to keep stable
+    vehicles = await get_vehicles()
+    for v in vehicles:
+        label = v.get("friendly_name") or v.get("license_plate") or v["vehicle_id"]
+        color_map[label] = CHART_COLORS[idx % len(CHART_COLORS)]
+        idx += 1
+
+    # Roads
+    road_names = [
+        "SR-91 (Turnpike)", "SR-869", "I-75", "I-95", "SR-924",
+        "I-595", "SR-417", "SR-528", "SR-408", "SR-112", "Other",
+    ]
+    for name in road_names:
+        if name not in color_map:
+            color_map[name] = CHART_COLORS[idx % len(CHART_COLORS)]
+            idx += 1
+
+    # Day of week
+    for day in ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]:
+        if day not in color_map:
+            color_map[day] = CHART_COLORS[idx % len(CHART_COLORS)]
+            idx += 1
+
+    return JSONResponse(color_map)
 
 
 @router.get("/analytics", response_class=HTMLResponse)

@@ -7,6 +7,27 @@ const CHART_COLORS = [
     '#1565c0', '#ff8f00', '#6d4c41', '#546e7a', '#d84315'
 ];
 
+// Global stable color map: label -> color (loaded once from server)
+let STABLE_COLORS = {};
+
+async function loadStableColors() {
+    try {
+        const response = await fetch('/api/color-map');
+        STABLE_COLORS = await response.json();
+    } catch (e) {
+        console.warn('Could not load color map:', e);
+    }
+}
+
+function getStableColor(label, fallbackIndex) {
+    if (STABLE_COLORS[label]) return STABLE_COLORS[label];
+    return CHART_COLORS[fallbackIndex % CHART_COLORS.length];
+}
+
+function getStableColors(labels) {
+    return labels.map((l, i) => getStableColor(l, i));
+}
+
 function createBarChart(canvasId, labels, data, label, horizontal = false) {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return null;
@@ -18,7 +39,7 @@ function createBarChart(canvasId, labels, data, label, horizontal = false) {
             datasets: [{
                 label: label,
                 data: data,
-                backgroundColor: CHART_COLORS.slice(0, labels.length),
+                backgroundColor: getStableColors(labels),
                 borderWidth: 0,
                 borderRadius: 4,
             }]
@@ -99,7 +120,7 @@ function createPieChart(canvasId, labels, data, label) {
             datasets: [{
                 label: label,
                 data: data,
-                backgroundColor: CHART_COLORS.slice(0, labels.length),
+                backgroundColor: getStableColors(labels),
                 borderWidth: 2,
                 borderColor: '#fff',
             }]
@@ -139,7 +160,7 @@ function createStackedBarChart(canvasId, labels, datasets) {
     const chartDatasets = datasets.map((ds, i) => ({
         label: ds.label,
         data: ds.data,
-        backgroundColor: CHART_COLORS[i % CHART_COLORS.length],
+        backgroundColor: getStableColor(ds.label, i),
         borderWidth: 0,
         borderRadius: 2,
     }));

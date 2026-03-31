@@ -167,6 +167,9 @@ async function refreshCharts() {
     }
 }
 
-document.addEventListener('DOMContentLoaded', refreshCharts);
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadStableColors();
+    refreshCharts();
+});
 </script>
 {% endblock %}
