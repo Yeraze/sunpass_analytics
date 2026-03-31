@@ -1,3 +1,6 @@
+// Disable datalabels globally — only enable per-chart for doughnuts
+Chart.defaults.plugins.datalabels = false;
+
 const CHART_COLORS = [
     '#004b87', '#f7941d', '#2e7d32', '#c62828', '#6a1b9a',
     '#00838f', '#ef6c00', '#4527a0', '#ad1457', '#00695c',
@@ -87,6 +90,8 @@ function createPieChart(canvasId, labels, data, label) {
     const ctx = document.getElementById(canvasId);
     if (!ctx) return null;
 
+    const total = data.reduce((a, b) => a + b, 0);
+
     return new Chart(ctx, {
         type: 'doughnut',
         data: {
@@ -107,9 +112,23 @@ function createPieChart(canvasId, labels, data, label) {
                     callbacks: {
                         label: (ctx) => `${ctx.label}: $${ctx.parsed.toFixed(2)}`
                     }
+                },
+                datalabels: {
+                    color: '#fff',
+                    font: { weight: 'bold', size: 11 },
+                    textStrokeColor: 'rgba(0,0,0,0.5)',
+                    textStrokeWidth: 2,
+                    formatter: (value, ctx) => {
+                        const pct = (value / total) * 100;
+                        if (pct < 8) return '';
+                        const name = ctx.chart.data.labels[ctx.dataIndex];
+                        return `${name}\n$${value.toFixed(0)}`;
+                    },
+                    textAlign: 'center',
                 }
             }
-        }
+        },
+        plugins: [ChartDataLabels],
     });
 }
 
