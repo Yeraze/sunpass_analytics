@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block title %}Toll Map - SunPass{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    #toll-map { height: 650px; border-radius: 12px; }
+    .map-container { background: white; border-radius: 12px; padding: 1rem; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .legend-box { background: white; padding: 10px 14px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.15); line-height: 1.8; }
+    .legend-box h6 { margin: 0 0 5px; font-size: 13px; }
+    .legend-dot { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+</style>
+{% endblock %}
+
+{% block content %}
+<h4 class="mb-3">Toll Heatmap</h4>
+
+<div class="filter-bar mb-3">
+    <div class="row g-3 align-items-end">
+        <div class="col-md-2">
+            <label class="form-label">From Date</label>
+            <input type="date" class="form-control" id="map-start" onchange="refreshMap()">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">To Date</label>
+            <input type="date" class="form-control" id="map-end" onchange="refreshMap()">
+        </div>
+        <div class="col-md-8 d-flex align-items-end gap-2">
+            <button class="btn btn-outline-secondary btn-sm" onclick="setMapRange(7)">Last 7 days</button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="setMapRange(14)">Last 14 days</button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="setMapRange(30)">Last 30 days</button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="setMapRange(90)">Last 90 days</button>
+            <button class="btn btn-outline-secondary btn-sm" onclick="clearMapRange()">All</button>
+        </div>
+    </div>
+</div>
+
+<div class="map-container">
+    <div id="toll-map"></div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+<script>
+const map = L.map('toll-map').setView([26.5, -80.3], 9);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors',
+    maxZoom: 18,
+}).addTo(map);
+
+let heatLayer = null;
+let markers = [];
+
+function setMapRange(days) {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(end.getDate() - days);
+    document.getElementById('map-start').value = start.toISOString().split('T')[0];
+    document.getElementById('map-end').value = end.toISOString().split('T')[0];
+    refreshMap();
+}
+
+function clearMapRange() {
+    document.getElementById('map-start').value = '';
+    document.getElementById('map-end').value = '';
+    refreshMap();
+}
+
+async function refreshMap() {
+    const params = {};
+    const start = document.getElementById('map-start').value;
+    const end = document.getElementById('map-end').value;
+    if (start) params.start_date = start;
+    if (end) params.end_date = end;
+
+    const query = new URLSearchParams(params).toString();
+    const url = query ? `/api/map/heatmap?${query}` : '/api/map/heatmap';
+    const response = await fetch(url);
+    const data = await response.json();
+
+    // Remove old layers
+    if (heatLayer) map.removeLayer(heatLayer);
+    markers.forEach(m => map.removeLayer(m));
+    markers = [];
+
+    if (!data.points.length) return;
+
+    // Build heat data: [lat, lng, intensity]
+    // Use count as intensity
+    const maxCount = Math.max(...data.points.map(p => p.count));
+    const heatData = data.points.map(p => [p.lat, p.lng, p.count / maxCount]);
+
+    heatLayer = L.heatLayer(heatData, {
+        radius: 30,
+        blur: 20,
+        maxZoom: 13,
+        gradient: {
+            0.2: '#004b87',
+            0.4: '#2e7d32',
+            0.6: '#f7941d',
+            0.8: '#c62828',
+            1.0: '#ff0000'
+        }
+    }).addTo(map);
+
+    // Add circle markers with popups for each plaza
+    data.points.forEach(p => {
+        const radius = Math.max(5, Math.min(20, (p.count / maxCount) * 20));
+        const marker = L.circleMarker([p.lat, p.lng], {
+            radius: radius,
+            fillColor: '#004b87',
+            fillOpacity: 0.6,
+            color: '#fff',
+            weight: 2,
+        }).addTo(map);
+        marker.bindPopup(
+            `<strong>${p.name}</strong><br>` +
+            `Trips: ${p.count}<br>` +
+            `Total: $${p.total.toFixed(2)}`
+        );
+        markers.push(marker);
+    });
+
+    // Fit bounds to data
+    const bounds = L.latLngBounds(data.points.map(p => [p.lat, p.lng]));
+    map.fitBounds(bounds, { padding: [30, 30] });
+}
+
+// Initial load
+refreshMap();
+</script>
+{% endblock %}

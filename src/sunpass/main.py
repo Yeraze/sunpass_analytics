@@ -11,7 +11,7 @@ PACKAGE_DIR = Path(__file__).resolve().parent
 
 from sunpass.config import SCRAPE_SCHEDULE
 from sunpass.db.models import init_db
-from sunpass.routes import analytics, dashboard, settings, transactions, vehicles
+from sunpass.routes import analytics, dashboard, map, settings, transactions, vehicles
 from sunpass.scraper.run import run_scrape
 
 logging.basicConfig(
@@ -68,5 +68,6 @@ app.mount("/static", StaticFiles(directory=str(PACKAGE_DIR / "static")), name="s
 app.include_router(dashboard.router)
 app.include_router(transactions.router)
 app.include_router(analytics.router)
+app.include_router(map.router)
 app.include_router(vehicles.router)
 app.include_router(settings.router)
