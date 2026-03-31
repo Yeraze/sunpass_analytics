@@ -14,10 +14,10 @@ A Dockerized web application that scrapes your [SunPass](https://www.sunpass.com
 - **Stable Chart Colors** — Each vehicle and road keeps the same color regardless of date range filters
 
 ## Screenshots
+<img width="1333" height="972" alt="Screenshot 2026-03-31 at 12 05 39 PM" src="https://github.com/user-attachments/assets/342a6be8-6ca7-4f29-9037-9043b7b32ae5" />
 
-| Dashboard | Analytics | Map |
-|-----------|-----------|-----|
-| Summary cards + trend | Stacked bars, pie charts | Toll plaza heatmap |
+<img width="1332" height="957" alt="Screenshot 2026-03-31 at 12 05 53 PM" src="https://github.com/user-attachments/assets/fe6f035a-5d09-4078-95f1-921c33757447" />
+
 
 ## Quick Start
 
