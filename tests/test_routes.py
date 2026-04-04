@@ -4,7 +4,7 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 
 from sunpass.db.models import init_db
-from sunpass.db.queries import insert_transaction, upsert_transponder, upsert_vehicle
+from sunpass.db.queries import insert_transaction
 from sunpass.main import app
 
 

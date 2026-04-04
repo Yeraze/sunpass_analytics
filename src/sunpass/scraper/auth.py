@@ -2,7 +2,7 @@ import asyncio
 import logging
 from pathlib import Path
 
-from playwright.async_api import Browser, BrowserContext, Page, async_playwright
+from playwright.async_api import BrowserContext, Page, async_playwright
 
 from sunpass.config import BASE_URL, LOGIN_URL, SUNPASS_PASSWORD, SUNPASS_USERNAME
 

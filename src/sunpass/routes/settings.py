@@ -1,7 +1,7 @@
 import asyncio
 
 from fastapi import APIRouter, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse
 
 from sunpass.config import SCRAPE_SCHEDULE
 from sunpass.db.queries import get_dashboard_summary, get_scrape_logs, get_transaction_count
