@@ -7,12 +7,12 @@ from apscheduler.triggers.cron import CronTrigger
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
-PACKAGE_DIR = Path(__file__).resolve().parent
-
 from sunpass.config import SCRAPE_SCHEDULE
 from sunpass.db.models import init_db
 from sunpass.routes import analytics, dashboard, map, settings, transactions, vehicles
 from sunpass.scraper.run import run_scrape
+
+PACKAGE_DIR = Path(__file__).resolve().parent
 
 logging.basicConfig(
     level=logging.INFO,
