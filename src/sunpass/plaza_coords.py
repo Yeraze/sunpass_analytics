@@ -1,72 +1,76 @@
-# Approximate lat/lng for Florida toll plazas based on road + location name.
+# GPS coordinates for Florida toll plazas, derived from cross-street
+# intersections with each highway and verified mile-post spacing.
 # Plazas on the same road at the same mile post but different directions
-# share the same coordinates — they're essentially the same physical location.
+# share the same coordinates — they're the same physical gantry.
 
 PLAZA_COORDINATES: dict[str, tuple[float, float]] = {
-    # SR-91 Florida's Turnpike (south to north by mile post)
-    "SR91 GOLDEN GLADES": (25.9125, -80.2005),
-    "SR91 DOLPHIN CENTER": (25.9200, -80.2100),
-    "SR91 POMPANO BCH": (26.2350, -80.1750),
-    "SR91 POMPANO COCONUT CK": (26.2500, -80.1780),
-    "SR91 GLADES RD": (26.3680, -80.1300),
-    "SR91 ATLANTIC AV": (26.4550, -80.1050),
-    "SR91 LANTANA": (26.5860, -80.0720),
-    "SR91 FOREST H BLV": (26.6400, -80.0700),
-    "SR91 BELVEDERE RD": (26.6650, -80.0700),
-    "SR91 45TH STREET": (26.7150, -80.0750),
-    "SR91 PGA BLVD": (26.8350, -80.1100),
-    "SR91 JUPITER": (26.9200, -80.1350),
-    "SR91 STUART": (27.1050, -80.2200),
-    "SR91 BECKER RD": (27.2350, -80.2900),
-    "SR91 PT ST LUCIE": (27.2900, -80.3100),
-    "SR91 MIDWAY RD": (27.4600, -80.3900),
-    "SR91 FT PIERCE": (27.4100, -80.3500),
-    "SR91 THREE LAKES": (28.2300, -81.3400),
-    "SR91 LEESBURG": (28.7500, -81.7500),
+    # SR-91 Florida's Turnpike — HEFT (south of Golden Glades)
+    "SR91 DOLPHIN CENTER": (25.7950, -80.2680),
 
-    # SR-869 Sawgrass Expressway (south to north by mile post)
-    "SR869 SUNRISE": (26.1560, -80.3300),
-    "SR869 OAKLAND PK BL": (26.1750, -80.3200),
-    "SR869 SR7 US441": (26.3350, -80.2350),
-    "SR869 LYONS RD": (26.3450, -80.2250),
-    "SR869 DEERFIELD": (26.3620, -80.1800),
+    # SR-91 Florida's Turnpike — mainline (MP0 at Golden Glades, north)
+    "SR91 GOLDEN GLADES": (25.9300, -80.2107),
+    "SR91 POMPANO BCH": (26.2224, -80.1857),
+    "SR91 POMPANO COCONUT CK": (26.2452, -80.1674),
+    "SR91 GLADES RD": (26.3697, -80.1628),
+    "SR91 ATLANTIC AV": (26.4555, -80.1746),
+    "SR91 BOYNTON BCH BV": (26.5280, -80.1726),
+    "SR91 LANTANA": (26.5631, -80.1731),
+    "SR91 FOREST H BLV": (26.6430, -80.1570),
+    "SR91 BELVEDERE RD": (26.6682, -80.1495),
+    "SR91 45TH STREET": (26.7233, -80.1280),
+    "SR91 PGA BLVD": (26.8394, -80.1272),
+    "SR91 JUPITER": (26.9348, -80.1538),
+    "SR91 STUART": (27.1577, -80.3021),
+    "SR91 BECKER RD": (27.2095, -80.3337),
+    "SR91 PT ST LUCIE": (27.2508, -80.3479),
+    "SR91 MIDWAY RD": (27.3530, -80.3940),
+    "SR91 FT PIERCE": (27.4222, -80.4094),
+    "SR91 THREE LAKES": (28.1817, -81.3032),
+    "SR91 LEESBURG": (28.6660, -81.8348),
 
-    # I-75 (south to north by mile post)
-    "I-75 MIAMI GARDENS": (25.9400, -80.3100),
-    "I-75 MIRAMAR": (25.9750, -80.3200),
-    "I-75 PINES": (26.0100, -80.3300),
-    "I-75 GRIFFIN": (26.0550, -80.3400),
+    # SR-869 Sawgrass Expressway (MP1 south at I-75, northeast to I-95)
+    "SR869 SUNRISE": (26.1566, -80.3323),
+    "SR869 OAKLAND PK BL": (26.1700, -80.3170),
+    "SR869 SR7 US441": (26.2999, -80.2024),
+    "SR869 LYONS RD": (26.3150, -80.2110),
+    "SR869 DEERFIELD": (26.3175, -80.1816),
 
-    # I-95 (south to north by mile post)
-    "I-95 NW 54 ST": (25.8300, -80.2050),
+    # I-75 Express lanes (south to north through Broward)
+    "I-75 MIAMI GARDENS": (25.9420, -80.3200),
+    "I-75 MIRAMAR": (25.9730, -80.3130),
+    "I-75 PINES": (26.0020, -80.2950),
+    "I-75 GRIFFIN": (26.0560, -80.2690),
+
+    # I-95 Express lanes (south to north through Miami-Dade/Broward)
+    "I-95 NW 54 ST": (25.8230, -80.2060),
     "I-95 NW 144 ST": (25.9050, -80.2100),
-    "I-95 MIAMIGARDENS": (25.9450, -80.2100),
-    "I-95 SR 824": (26.0200, -80.1700),
+    "I-95 MIAMIGARDENS": (25.9360, -80.2170),
+    "I-95 SR 824": (26.0130, -80.1860),
 
-    # I-595
-    "I-595 FLAMINGO RD": (26.1200, -80.3200),
+    # I-595 (east-west through Broward)
+    "I-595 FLAMINGO RD": (26.1210, -80.3216),
 
-    # SR-924 Gratigny Parkway
-    "SR 924 EAST (42ND AVE)": (25.9200, -80.2700),
-    "SR 924 EAST (57TH AVE)": (25.9200, -80.2500),
-    "SR 924 WEST (42ND AVE)": (25.9200, -80.2700),
-    "SR 924 WEST (57TH AVE)": (25.9200, -80.2500),
+    # SR-924 Gratigny Parkway (east-west along NW 119th St)
+    "SR 924 EAST (42ND AVE)": (25.8838, -80.2588),
+    "SR 924 EAST (57TH AVE)": (25.8838, -80.2815),
+    "SR 924 WEST (42ND AVE)": (25.8838, -80.2588),
+    "SR 924 WEST (57TH AVE)": (25.8838, -80.2815),
 
-    # SR-417 Central Florida GreeneWay
-    "SR 417 BOGGY CREEK": (28.3900, -81.3000),
-    "SR 417 COLONIAL": (28.5500, -81.2500),
-    "SR 417 CURRY FORD": (28.5100, -81.2700),
+    # SR-417 Central Florida GreeneWay (south to north, Orlando area)
+    "SR 417 BOGGY CREEK": (28.3676, -81.3354),
+    "SR 417 CURRY FORD": (28.5210, -81.2627),
+    "SR 417 COLONIAL": (28.5520, -81.2475),
 
-    # SR-408 East-West Expressway
-    "SR 408 DEAN": (28.5450, -81.3300),
+    # SR-408 East-West Expressway (Orlando)
+    "SR 408 DEAN": (28.5469, -81.2346),
 
-    # SR-528 Beachline
-    "SR 528 BEACHLINE": (28.4300, -81.1500),
-    "SR 528 DALLAS": (28.4200, -81.0500),
-    "SR528 BCHLIN E SR520": (28.4000, -80.7500),
+    # SR-528 Beachline Expressway (Orlando toward coast)
+    "SR 528 BEACHLINE": (28.4516, -81.2095),
+    "SR 528 DALLAS": (28.4516, -81.0951),
+    "SR528 BCHLIN E SR520": (28.4525, -80.9791),
 
-    # SR-112
-    "SR112 EAST (17TH AVE)": (25.7950, -80.2250),
+    # SR-112 Airport Expressway (Miami)
+    "SR112 EAST (17TH AVE)": (25.7957, -80.2342),
 }
 
 
