@@ -11,6 +11,7 @@ router = APIRouter()
 async def dashboard(request: Request):
     summary = await get_dashboard_summary()
     return templates.TemplateResponse(
-        request, "dashboard.html",
+        request,
+        "dashboard.html",
         {"summary": summary, "active_page": "dashboard"},
     )

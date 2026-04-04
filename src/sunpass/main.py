@@ -1,4 +1,5 @@
 import logging
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -23,7 +24,7 @@ logger = logging.getLogger(__name__)
 scheduler = AsyncIOScheduler()
 
 
-def parse_cron_schedule(expr: str) -> dict:
+def parse_cron_schedule(expr: str) -> dict[str, str | int]:
     """Parse a cron expression (minute hour day month day_of_week) into CronTrigger kwargs."""
     parts = expr.strip().split()
     if len(parts) != 5:
@@ -38,7 +39,7 @@ def parse_cron_schedule(expr: str) -> dict:
     }
 
 
-async def scheduled_scrape():
+async def scheduled_scrape() -> None:
     try:
         await run_scrape()
     except Exception as e:
@@ -46,7 +47,7 @@ async def scheduled_scrape():
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     await init_db()
     logger.info("Database initialized")
 

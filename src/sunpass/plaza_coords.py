@@ -6,7 +6,6 @@
 PLAZA_COORDINATES: dict[str, tuple[float, float]] = {
     # SR-91 Florida's Turnpike — HEFT (south of Golden Glades)
     "SR91 DOLPHIN CENTER": (25.7950, -80.2680),
-
     # SR-91 Florida's Turnpike — mainline (MP0 at Golden Glades, north)
     "SR91 GOLDEN GLADES": (25.9300, -80.2107),
     "SR91 POMPANO BCH": (26.2224, -80.1857),
@@ -27,48 +26,39 @@ PLAZA_COORDINATES: dict[str, tuple[float, float]] = {
     "SR91 FT PIERCE": (27.4222, -80.4094),
     "SR91 THREE LAKES": (28.1817, -81.3032),
     "SR91 LEESBURG": (28.6660, -81.8348),
-
     # SR-869 Sawgrass Expressway (MP1 south at I-75, northeast to I-95)
     "SR869 SUNRISE": (26.1566, -80.3323),
     "SR869 OAKLAND PK BL": (26.1700, -80.3170),
     "SR869 SR7 US441": (26.2999, -80.2024),
     "SR869 LYONS RD": (26.3150, -80.2110),
     "SR869 DEERFIELD": (26.3175, -80.1816),
-
     # I-75 Express lanes (south to north through Broward)
     "I-75 MIAMI GARDENS": (25.9420, -80.3200),
     "I-75 MIRAMAR": (25.9730, -80.3130),
     "I-75 PINES": (26.0020, -80.2950),
     "I-75 GRIFFIN": (26.0560, -80.2690),
-
     # I-95 Express lanes (south to north through Miami-Dade/Broward)
     "I-95 NW 54 ST": (25.8230, -80.2060),
     "I-95 NW 144 ST": (25.9050, -80.2100),
     "I-95 MIAMIGARDENS": (25.9360, -80.2170),
     "I-95 SR 824": (26.0130, -80.1860),
-
     # I-595 (east-west through Broward)
     "I-595 FLAMINGO RD": (26.1210, -80.3216),
-
     # SR-924 Gratigny Parkway (east-west along NW 119th St)
     "SR 924 EAST (42ND AVE)": (25.8838, -80.2588),
     "SR 924 EAST (57TH AVE)": (25.8838, -80.2815),
     "SR 924 WEST (42ND AVE)": (25.8838, -80.2588),
     "SR 924 WEST (57TH AVE)": (25.8838, -80.2815),
-
     # SR-417 Central Florida GreeneWay (south to north, Orlando area)
     "SR 417 BOGGY CREEK": (28.3676, -81.3354),
     "SR 417 CURRY FORD": (28.5210, -81.2627),
     "SR 417 COLONIAL": (28.5520, -81.2475),
-
     # SR-408 East-West Expressway (Orlando)
     "SR 408 DEAN": (28.5469, -81.2346),
-
     # SR-528 Beachline Expressway (Orlando toward coast)
     "SR 528 BEACHLINE": (28.4516, -81.2095),
     "SR 528 DALLAS": (28.4516, -81.0951),
     "SR528 BCHLIN E SR520": (28.4525, -80.9791),
-
     # SR-112 Airport Expressway (Miami)
     "SR112 EAST (17TH AVE)": (25.7957, -80.2342),
 }
@@ -89,8 +79,11 @@ def get_plaza_coords(plaza_name: str) -> tuple[float, float] | None:
 
     # Strip direction indicators and mile post suffixes to match base name
     import re
+
     # Remove direction + "ON"/"OFF" + mile post at end
-    cleaned = re.sub(r"\s+(NB|SB|EB|WB)\s*(ON|OFF|MAIN|EXLN)?\s*(MP\s*\d+)?$", "", plaza_name).strip()
+    cleaned = re.sub(
+        r"\s+(NB|SB|EB|WB)\s*(ON|OFF|MAIN|EXLN)?\s*(MP\s*\d+)?$", "", plaza_name
+    ).strip()
     if cleaned in PLAZA_COORDINATES:
         return PLAZA_COORDINATES[cleaned]
 

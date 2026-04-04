@@ -2,7 +2,7 @@ import asyncio
 import logging
 from pathlib import Path
 
-from playwright.async_api import BrowserContext, Page, async_playwright
+from playwright.async_api import Browser, BrowserContext, Page, Playwright, async_playwright
 
 from sunpass.config import BASE_URL, LOGIN_URL, SUNPASS_PASSWORD, SUNPASS_USERNAME
 
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 SCREENSHOT_DIR = Path("/app/data/screenshots")
 
 
-async def take_screenshot(page: Page, name: str):
+async def take_screenshot(page: Page, name: str) -> None:
     SCREENSHOT_DIR.mkdir(parents=True, exist_ok=True)
     path = SCREENSHOT_DIR / f"{name}.png"
     await page.screenshot(path=str(path))
@@ -29,7 +29,9 @@ async def login(context: BrowserContext, max_retries: int = 3) -> Page:
             await page.wait_for_timeout(3000)
 
             # Click "MY SUNPASS" to reveal the login form
-            my_sunpass = await page.query_selector('a:has-text("MY SUNPASS"), a:has-text("My SunPass")')
+            my_sunpass = await page.query_selector(
+                'a:has-text("MY SUNPASS"), a:has-text("My SunPass")'
+            )
             if my_sunpass:
                 await my_sunpass.click()
                 await page.wait_for_timeout(2000)
@@ -41,7 +43,9 @@ async def login(context: BrowserContext, max_retries: int = 3) -> Page:
             await page.fill('input[name="password"]', SUNPASS_PASSWORD)
 
             # Find and click the login submit button
-            submit_btn = await page.query_selector('#tt_submit, button[type="submit"], input[type="submit"]')
+            submit_btn = await page.query_selector(
+                '#tt_submit, button[type="submit"], input[type="submit"]'
+            )
             if submit_btn:
                 await submit_btn.click()
             else:
@@ -74,7 +78,7 @@ async def login(context: BrowserContext, max_retries: int = 3) -> Page:
     raise RuntimeError("Login failed after all retries")
 
 
-async def create_browser_context() -> tuple:
+async def create_browser_context() -> tuple[Playwright, Browser, BrowserContext]:
     """Create and return (playwright, browser, context) tuple."""
     pw = await async_playwright().start()
     browser = await pw.chromium.launch(headless=True)

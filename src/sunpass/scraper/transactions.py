@@ -153,7 +153,7 @@ async def _parse_transaction_page(page: Page) -> int:
             transponder_id = None
             license_plate = None
             plate_text = plate_transponder.split("\n")[0].strip()  # Remove "(view image)" link text
-            plate_text = re.sub(r'\(view image\)', '', plate_text).strip()
+            plate_text = re.sub(r"\(view image\)", "", plate_text).strip()
 
             if plate_text.replace("-", "").replace(" ", "").isdigit() and len(plate_text) >= 8:
                 transponder_id = plate_text
@@ -183,7 +183,11 @@ async def _parse_transaction_page(page: Page) -> int:
 
             logger.debug(
                 "Transaction: %s | %s | %s | %s | $%.2f",
-                txn_datetime, plate_text, description, txn_type, amount,
+                txn_datetime,
+                plate_text,
+                description,
+                txn_type,
+                amount,
             )
 
             inserted = await insert_transaction(

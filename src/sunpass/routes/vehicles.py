@@ -12,7 +12,8 @@ async def vehicles_page(request: Request):
     vehicles = await get_vehicles()
     transponders = await get_transponders()
     return templates.TemplateResponse(
-        request, "vehicles.html",
+        request,
+        "vehicles.html",
         {
             "vehicles": vehicles,
             "transponders": transponders,

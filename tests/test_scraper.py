@@ -106,7 +106,7 @@ class TestParseDetails:
         assert _parse_details("") == {}
 
     def test_partial_details(self):
-        html = '<b>Agency Name:</b> SunPass<br>'
+        html = "<b>Agency Name:</b> SunPass<br>"
         result = _parse_details(html)
         assert result["agency"] == "SunPass"
         assert "transaction_number" not in result

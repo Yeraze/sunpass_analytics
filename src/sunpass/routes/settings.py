@@ -10,6 +10,8 @@ from sunpass.scraper.run import is_scraping, run_scrape
 
 router = APIRouter()
 
+_background_tasks: set[asyncio.Task[None]] = set()
+
 
 @router.get("/settings", response_class=HTMLResponse)
 async def settings_page(request: Request):
@@ -17,7 +19,8 @@ async def settings_page(request: Request):
     summary = await get_dashboard_summary()
     txn_count = await get_transaction_count()
     return templates.TemplateResponse(
-        request, "settings.html",
+        request,
+        "settings.html",
         {
             "logs": logs,
             "schedule": SCRAPE_SCHEDULE,
@@ -36,7 +39,9 @@ async def trigger_scrape():
     if is_scraping():
         return HTMLResponse('<span class="text-warning">Scrape already in progress...</span>')
 
-    asyncio.create_task(run_scrape())
+    task = asyncio.create_task(run_scrape())
+    _background_tasks.add(task)
+    task.add_done_callback(_background_tasks.discard)
     return HTMLResponse('<span class="text-success">Scrape started!</span>')
 
 

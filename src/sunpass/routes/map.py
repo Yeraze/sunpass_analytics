@@ -11,7 +11,8 @@ router = APIRouter()
 @router.get("/map", response_class=HTMLResponse)
 async def map_page(request: Request):
     return templates.TemplateResponse(
-        request, "map.html",
+        request,
+        "map.html",
         {"active_page": "map"},
     )
 
@@ -24,18 +25,21 @@ async def api_heatmap(start_date: str | None = None, end_date: str | None = None
     for r in data:
         coords = get_plaza_coords(r["plaza_name"])
         if coords:
-            points.append({
-                "lat": coords[0],
-                "lng": coords[1],
-                "count": r["count"],
-                "total": r["total"],
-                "name": r["plaza_name"],
-            })
+            points.append(
+                {
+                    "lat": coords[0],
+                    "lng": coords[1],
+                    "count": r["count"],
+                    "total": r["total"],
+                    "name": r["plaza_name"],
+                }
+            )
         else:
             unmatched.append(r["plaza_name"])
 
     if unmatched:
         import logging
+
         logging.getLogger(__name__).warning("Unmatched plazas: %s", unmatched)
 
     return JSONResponse({"points": points, "unmatched": unmatched})

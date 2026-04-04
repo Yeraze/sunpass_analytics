@@ -1,4 +1,5 @@
 import aiosqlite
+
 from sunpass.config import DB_PATH
 
 SCHEMA_SQL = """
@@ -70,7 +71,7 @@ async def get_db() -> aiosqlite.Connection:
     return db
 
 
-async def init_db():
+async def init_db() -> None:
     db = await get_db()
     try:
         await db.executescript(SCHEMA_SQL)

@@ -35,7 +35,8 @@ async def transactions_page(
         plaza_name=plaza_name,
     )
     return templates.TemplateResponse(
-        request, "transactions.html",
+        request,
+        "transactions.html",
         {
             "transactions": txns,
             "total_count": total_count,
@@ -74,7 +75,8 @@ async def transaction_table_fragment(
         plaza_name=plaza_name,
     )
     return templates.TemplateResponse(
-        request, "fragments/transaction_table.html",
+        request,
+        "fragments/transaction_table.html",
         {"transactions": txns, "total_count": total_count},
     )
 
@@ -100,15 +102,17 @@ async def export_transactions(
     writer = csv.writer(output)
     writer.writerow(["Date", "Posted Date", "Plaza/Road", "Agency", "Vehicle", "Type", "Amount"])
     for txn in txns:
-        writer.writerow([
-            txn.get("transaction_date", ""),
-            txn.get("posted_date", ""),
-            txn.get("plaza_name", ""),
-            txn.get("agency", ""),
-            txn.get("vehicle_label", "") or txn.get("vehicle_id", ""),
-            txn.get("transaction_type", ""),
-            txn.get("amount", ""),
-        ])
+        writer.writerow(
+            [
+                txn.get("transaction_date", ""),
+                txn.get("posted_date", ""),
+                txn.get("plaza_name", ""),
+                txn.get("agency", ""),
+                txn.get("vehicle_label", "") or txn.get("vehicle_id", ""),
+                txn.get("transaction_type", ""),
+                txn.get("amount", ""),
+            ]
+        )
 
     output.seek(0)
     return StreamingResponse(

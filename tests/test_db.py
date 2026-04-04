@@ -79,7 +79,9 @@ class TestUpsertTransponder:
 
     async def test_get_transponders(self):
         await upsert_vehicle("V001", friendly_name="Car A", license_plate="AAA111")
-        await upsert_transponder("T001", transponder_type="Sticker", status="Active", vehicle_id="V001")
+        await upsert_transponder(
+            "T001", transponder_type="Sticker", status="Active", vehicle_id="V001"
+        )
         transponders = await get_transponders()
         assert len(transponders) == 1
         assert transponders[0]["transponder_id"] == "T001"
@@ -247,8 +249,11 @@ class TestScrapeLog:
         assert log_id is not None
 
         await update_scrape_log(
-            log_id, status="success",
-            transactions_added=10, vehicles_added=2, transponders_added=3,
+            log_id,
+            status="success",
+            transactions_added=10,
+            vehicles_added=2,
+            transponders_added=3,
         )
 
         logs = await get_scrape_logs(limit=1)
