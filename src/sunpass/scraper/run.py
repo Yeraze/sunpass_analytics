@@ -15,7 +15,7 @@ def is_scraping() -> bool:
     return _scraping
 
 
-async def run_scrape(from_date: str | None = None):
+async def run_scrape(from_date: str | None = None) -> None:
     """Run a full scrape cycle: login, scrape vehicles, scrape transactions."""
     global _scraping
     if _scraping:

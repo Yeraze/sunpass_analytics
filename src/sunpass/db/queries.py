@@ -172,9 +172,7 @@ async def get_transaction_count(
             params.append(plaza_name)
 
         where = f"WHERE {' AND '.join(conditions)}" if conditions else ""
-        cursor = await db.execute(
-            f"SELECT COUNT(*) as cnt FROM transactions {where}", params
-        )
+        cursor = await db.execute(f"SELECT COUNT(*) as cnt FROM transactions {where}", params)
         row = await cursor.fetchone()
         return row["cnt"] if row else 0
     finally:
@@ -217,6 +215,7 @@ def _extract_road_name(plaza_name: str) -> str:
         'PAYMENT & ADJUSTMENTS' -> 'Other'
     """
     import re
+
     if not plaza_name:
         return "Other"
 
@@ -418,7 +417,10 @@ async def get_spending_by_day_of_week(
         )
         rows = await cursor.fetchall()
         day_names = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-        return [{"day": day_names[row["dow"]], "total": row["total"], "count": row["count"]} for row in rows]
+        return [
+            {"day": day_names[row["dow"]], "total": row["total"], "count": row["count"]}
+            for row in rows
+        ]
     finally:
         await db.close()
 
@@ -485,9 +487,7 @@ async def get_dashboard_summary() -> dict[str, Any]:
         row = await cursor.fetchone()
         transponder_count = row["cnt"] if row else 0
 
-        cursor = await db.execute(
-            "SELECT * FROM scrape_log ORDER BY started_at DESC LIMIT 1"
-        )
+        cursor = await db.execute("SELECT * FROM scrape_log ORDER BY started_at DESC LIMIT 1")
         last_scrape = await cursor.fetchone()
 
         return {
@@ -558,7 +558,7 @@ async def update_scrape_log(
     transactions_added: int = 0,
     vehicles_added: int = 0,
     transponders_added: int = 0,
-):
+) -> None:
     db = await get_db()
     try:
         await db.execute(

@@ -44,7 +44,8 @@ async def scrape_vehicles_and_transponders(page: Page) -> tuple[int, int]:
 
     logger.info(
         "Vehicles scraped: %d new/updated, Transponders: %d new/updated",
-        vehicles_added, transponders_added,
+        vehicles_added,
+        transponders_added,
     )
     return vehicles_added, transponders_added
 
@@ -81,7 +82,11 @@ async def _parse_vehicles_page(page: Page) -> tuple[int, int]:
 
             logger.info(
                 "Transponder: %s | Type: %s | Status: %s | Plate: %s | Name: %s",
-                transponder_id, transponder_type, status, plate_text, friendly_name,
+                transponder_id,
+                transponder_type,
+                status,
+                plate_text,
+                friendly_name,
             )
 
             vehicle_id = transponder_id
