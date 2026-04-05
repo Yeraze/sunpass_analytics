@@ -4,8 +4,8 @@
 # share the same coordinates — they're the same physical gantry.
 
 PLAZA_COORDINATES: dict[str, tuple[float, float]] = {
-    # SR-91 Florida's Turnpike — HEFT (south of Golden Glades)
-    "SR91 DOLPHIN CENTER": (25.7950, -80.2680),
+    # SR-91 Florida's Turnpike — Exit 2X near Hard Rock Stadium / NW 199th St
+    "SR91 DOLPHIN CENTER": (25.9575, -80.2400),
     # SR-91 Florida's Turnpike — mainline (MP0 at Golden Glades, north)
     "SR91 GOLDEN GLADES": (25.9300, -80.2107),
     "SR91 POMPANO BCH": (26.2224, -80.1857),
@@ -34,9 +34,9 @@ PLAZA_COORDINATES: dict[str, tuple[float, float]] = {
     "SR869 DEERFIELD": (26.3175, -80.1816),
     # I-75 Express lanes (south to north through Broward)
     "I-75 MIAMI GARDENS": (25.9420, -80.3200),
-    "I-75 MIRAMAR": (25.9730, -80.3130),
-    "I-75 PINES": (26.0020, -80.2950),
-    "I-75 GRIFFIN": (26.0560, -80.2690),
+    "I-75 MIRAMAR": (25.9790, -80.3340),
+    "I-75 PINES": (26.0030, -80.3400),
+    "I-75 GRIFFIN": (26.0632, -80.3546),
     # I-95 Express lanes (south to north through Miami-Dade/Broward)
     "I-95 NW 54 ST": (25.8230, -80.2060),
     "I-95 NW 144 ST": (25.9050, -80.2100),
@@ -60,7 +60,7 @@ PLAZA_COORDINATES: dict[str, tuple[float, float]] = {
     "SR 528 DALLAS": (28.4516, -81.0951),
     "SR528 BCHLIN E SR520": (28.4525, -80.9791),
     # SR-112 Airport Expressway (Miami)
-    "SR112 EAST (17TH AVE)": (25.7957, -80.2342),
+    "SR112 EAST (17TH AVE)": (25.7960, -80.2280),
 }
 
 
