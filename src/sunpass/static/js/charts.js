@@ -98,6 +98,7 @@ function createLineChart(canvasId, labels, data, label) {
             },
             scales: {
                 y: {
+                    beginAtZero: true,
                     ticks: {
                         callback: (val) => '$' + val.toFixed(0)
                     }
