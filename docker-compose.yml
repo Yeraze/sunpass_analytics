@@ -1,13 +1,18 @@
 services:
   sunpass:
     build: .
-    ports:
-      - "9180:8080"
+    networks:
+      - npm
     environment:
       - SUNPASS_USERNAME=${SUNPASS_USERNAME}
       - SUNPASS_PASSWORD=${SUNPASS_PASSWORD}
       - SUNPASS_SCRAPE_SCHEDULE=${SUNPASS_SCRAPE_SCHEDULE:-0 6 * * *}
       - SUNPASS_DATA_DIR=/app/data
+      - TZ=America/New_York
     volumes:
       - ./data:/app/data
     restart: unless-stopped
+
+networks:
+  npm:
+    external: true
