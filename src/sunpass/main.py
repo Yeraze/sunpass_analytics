@@ -1,10 +1,12 @@
 import logging
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.date import DateTrigger
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
@@ -22,6 +24,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 scheduler = AsyncIOScheduler()
+
+RETRY_JOB_ID = "sunpass_scrape_retry"
+RETRY_DELAY = timedelta(hours=1)
 
 
 def parse_cron_schedule(expr: str) -> dict[str, str | int]:
@@ -44,6 +49,14 @@ async def scheduled_scrape() -> None:
         await run_scrape()
     except Exception as e:
         logger.error("Scheduled scrape failed: %s", e)
+        retry_at = datetime.now() + RETRY_DELAY
+        scheduler.add_job(
+            scheduled_scrape,
+            DateTrigger(run_date=retry_at),
+            id=RETRY_JOB_ID,
+            replace_existing=True,
+        )
+        logger.info("Retry scheduled for %s", retry_at.isoformat(timespec="seconds"))
 
 
 @asynccontextmanager
